@@ -54,7 +54,8 @@ async function login() {
   token = r.token; history = []; $("chat").innerHTML = "";
   $("scope").textContent = "Signed in as " + r.user.name + ". The assistant only sees what this account can see.";
 }
-function add(role, text) { const d = document.createElement("div"); d.className = "msg " + role; d.textContent = text; $("chat").appendChild(d); $("chat").scrollTop = 1e9; }
+function md(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>").replace(/^#{1,4} /gm,""); }
+function add(role, text) { const d = document.createElement("div"); d.className = "msg " + role; d.innerHTML = md(text); $("chat").appendChild(d); $("chat").scrollTop = 1e9; }
 async function send() {
   const message = $("msg").value.trim(); if (!message) return;
   add("user", message); $("msg").value = "";
