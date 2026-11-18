@@ -2,6 +2,8 @@
 
 The conversational assistant of a multi-entity HR platform (9 country subsidiaries, one PostgreSQL schema per country). HR staff ask questions in natural language; the model answers by calling **8 whitelisted tools**, and every tool enforces the asking user's data scope.
 
+**▶ [Demo video, about 2 min, French narration](https://github.com/MejriRami/hr-assistant-agent/releases/download/demo/4_Assistant_RH.mp4)** · fictional data
+
 > **Résumé (FR)** : assistant RH conversationnel (function calling) intégré à une plateforme RH multi-filiales. Le modèle n'écrit jamais de SQL : il appelle 8 outils, et chaque outil applique les droits de l'utilisateur authentifié (pays, site). Pas d'outil de paie. Extrait d'un projet livré en entreprise ; données fictives.
 
 ![tests](https://github.com/MejriRami/hr-assistant-agent/actions/workflows/tests.yml/badge.svg)
