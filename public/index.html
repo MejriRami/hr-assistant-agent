@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HR Assistant</title>
+<style>
+  :root { --bg:#f5f7fa; --surface:#fff; --ink:#14263a; --muted:#5b6f82; --line:#dde5ed; --brand:#0b5cad; --soft:#e8f1fb; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 "Segoe UI", Inter, system-ui, sans-serif; }
+  header { background:var(--surface); border-bottom:1px solid var(--line); }
+  .bar { max-width:900px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:12px; }
+  .logo { font-weight:650; } .logo small { display:block; font-weight:400; color:var(--muted); font-size:12px; }
+  select { margin-left:auto; font:inherit; padding:8px 10px; border:1px solid #cdd8e3; border-radius:8px; background:#fff; }
+  main { max-width:900px; margin:20px auto; padding:0 20px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px; }
+  .scope { font-size:13px; color:var(--muted); margin-bottom:10px; }
+  .chat { height:440px; overflow-y:auto; padding:8px; background:#fbfcfe; border:1px solid var(--line); border-radius:8px; }
+  .msg { max-width:82%; margin:6px 0; padding:9px 12px; border-radius:10px; white-space:pre-wrap; }
+  .msg.user { background:var(--brand); color:#fff; margin-left:auto; }
+  .msg.assistant { background:#fff; border:1px solid var(--line); }
+  .row { display:flex; gap:8px; margin-top:10px; }
+  input { flex:1; font:inherit; padding:10px 12px; border:1px solid #cdd8e3; border-radius:8px; }
+  button { font:inherit; font-weight:600; border-radius:8px; padding:10px 16px; cursor:pointer; background:var(--brand); color:#fff; border:1px solid var(--brand); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chip { background:#fff; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:4px 10px; font-size:13px; font-weight:400; }
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <div class="logo">HR Assistant<small>Northwind Components, fictional data</small></div>
+  <select id="who">
+    <option value="group">Laura Petit (group HR, all countries)</option>
+    <option value="france">Hugo Durand (HR France)</option>
+    <option value="suzhou">Li Na (HR, Suzhou plant only)</option>
+  </select>
+</div></header>
+<main><div class="card">
+  <div class="scope" id="scope"></div>
+  <div class="chat" id="chat"></div>
+  <div class="row"><input id="msg" placeholder="Ask about employees, sites, leave balances or HR requests…"><button id="send">Send</button></div>
+  <div class="chips" id="chips"></div>
+</div></main>
+<script>
+const $ = (id) => document.getElementById(id);
+let token = null, history = [];
+const examples = ["How many active employees can I see?", "Who joined most recently?",
+                  "What is Wang Lei's leave balance?", "List the pending HR requests", "What is Sami Trabelsi's salary?"];
+examples.forEach(q => { const b = document.createElement("button"); b.className = "chip"; b.textContent = q;
+  b.onclick = () => { $("msg").value = q; send(); }; $("chips").appendChild(b); });
+
+async function login() {
+  const r = await fetch("/api/demo-login", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({user: $("who").value})}).then(r => r.json());
+  token = r.token; history = []; $("chat").innerHTML = "";
+  $("scope").textContent = "Signed in as " + r.user.name + ". The assistant only sees what this account can see.";
+}
+function add(role, text) { const d = document.createElement("div"); d.className = "msg " + role; d.textContent = text; $("chat").appendChild(d); $("chat").scrollTop = 1e9; }
+async function send() {
+  const message = $("msg").value.trim(); if (!message) return;
+  add("user", message); $("msg").value = "";
+  const r = await fetch("/api/chatbot/message", {method:"POST", headers:{"Content-Type":"application/json", Authorization:"Bearer " + token},
+    body: JSON.stringify({message, history})}).then(r => r.json());
+  const reply = r.reply || r.error || "Error";
+  add("assistant", reply);
+  history.push({role:"user", content: message}, {role:"assistant", content: reply});
+}
+$("who").onchange = login; $("send").onclick = send; $("msg").onkeydown = (e) => { if (e.key === "Enter") send(); };
+login();
+</script>
+</body>
+</html>

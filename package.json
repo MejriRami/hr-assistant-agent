@@ -1,0 +1,19 @@
+{
+  "name": "hr-assistant-agent",
+  "version": "1.0.0",
+  "description": "Tool-calling HR assistant with per-user, per-tenant data scoping",
+  "private": true,
+  "scripts": {
+    "start": "node src/server.cjs",
+    "seed": "node db/seed.cjs",
+    "test": "node --test test/scope.test.cjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "openai": "^4.67.0",
+    "pg": "^8.12.0"
+  },
+  "engines": { "node": ">=18" }
+}
